@@ -43,17 +43,16 @@ MidiVolts voice[4] = {MidiVolts(10, V0), MidiVolts(11, V1), MidiVolts(12, V2), M
 
 void setup() {
 
-  // for fine tune calibration, please see README or Calibration Guide
-  // sample code for calibration
-  voice[0].Gain = 1;
-  voice[0].Offset = 0;
-  voice[1].Gain = 1.008;
-  voice[1].Offset = 0;
-  voice[2].Gain = 1;
-  voice[2].Offset = 0;
-  voice[3].Gain = 1.004;
-  voice[3].Offset = 0.003;
-
+// for fine tune calibration, please see README or Calibration Guide
+// sample code for calibration
+//  voice[0].Gain = 1;
+//  voice[0].Offset = 0;
+//  voice[1].Gain = 1.008;
+//  voice[1].Offset = 0;
+//  voice[2].Gain = 1;
+//  voice[2].Offset = 0;
+//  voice[3].Gain = 1.004;
+//  voice[3].Offset = 0.003;
 
   Serial.begin(31250); //Midi baud
   Wire.begin();
