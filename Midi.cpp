@@ -27,9 +27,23 @@ void Midi::Listen()
     {
       while (!Serial.available()) {} // waits until serial exists
       Velocity = Serial.read();
-      On = true;
+
+      if (Velocity != 0)
+      {
+        On = true;
+        _noteTracking++;
+      }
+      else
+      {
+        Off = true;
+
+        if (_noteTracking > 0)
+        {
+          _noteTracking--;
+        }
+      }
+
       MidiNum = currentByte;
-      _noteTracking++;
     }
     else if (currentByte < 128 && _statusByte == 128) // note off and pitch byte
     {
