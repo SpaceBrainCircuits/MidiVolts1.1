@@ -1,5 +1,5 @@
 /*
-  MidiVolts - Sample code for public use by Space Brain Circuits...
+  MidiVolts - Sample code for public use by Space Brain Circuits... mono working
 */
 
 // ************************************* USER DEFINE PARAMETERS *************************************
@@ -10,7 +10,7 @@
 // 3 VOICE POLYPHONIC ON V0, V1, V2 WITH MOD WHEEL ON V3: ..........................................3
 // 4 VOICE POLYPHONIC ON V0, V1, V2, V3: ...........................................................4
 // 4 VOICE UNISON ON V0, V1, V2, V3: ...............................................................5
-#define MODE 3
+#define MODE 1
 
 // CHOOSE RANGE OF SEMITONES FOR PITCH BEND WHEEL (DEFAULT UP: 2, DEFAULT DOWN: 12)
 #define PITCH_BEND_SEMITONES_UP 2
@@ -33,18 +33,19 @@
 
 // **************************************************************************************************
 
-
 #include "MidiVolts.h"
 #include "Midi.h"
 
 Midi midi; //Initialize class for listening to Midi Messages
+uint8_t UnusedNotes[8]; //Used to track held notes
+uint8_t voices; //Number of voices set per MODE selection
 
 MidiVolts voice[4] = {MidiVolts(10, V0), MidiVolts(11, V1), MidiVolts(12, V2), MidiVolts(13, V3)}; // MidiVolts(GatePin, Channel)
 
 void setup() {
 
-// for fine tune calibration, please see README or Calibration Guide
-// sample code for calibration
+  // for fine tune calibration, please see README or Calibration Guide
+  // sample code for calibration
 //  voice[0].Gain = 1;
 //  voice[0].Offset = 0;
 //  voice[1].Gain = 1.008;
@@ -59,6 +60,8 @@ void setup() {
 
   pinMode(CLOCK_PIN, OUTPUT);
 
+  memset(UnusedNotes, 128, sizeof(UnusedNotes));
+
   if (MODE == 1) {
     voice[V0].VelocityPin = V1; //pitch CV set on V0 will have corresponding Velocity on V1
   }
@@ -66,6 +69,15 @@ void setup() {
   {
     voice[V0].VelocityPin = V2; //pitch CV set on V0 will have corresponding Velocity on V2
     voice[V1].VelocityPin = V3; //pitch CV set on V1 will have corresponding Velocity on V3
+  }
+
+  if (MODE == 5)
+  {
+    voices = 1;
+  }
+  else
+  {
+    voices = MODE;
   }
 }
 
@@ -140,55 +152,103 @@ void loop() {
   }
 }
 
+
 void NoteOn(byte midiNum, byte velocity) // Sets voltage to next available voice.
 {
-  if (MODE != 5)
-  {
-    for (int i = 0; i < MODE; i++) {
-
-      if (voice[i].noteState == false)
+  for (int i = 0; i < voices; i++) {
+    if (voice[i].noteState == false)
+    {
+      if (MODE == 5)
+      {
+        voice[V0].NoteOn(midiNum);
+        voice[V1].NoteOn(midiNum);
+        voice[V2].NoteOn(midiNum);
+        voice[V3].NoteOn(midiNum);
+      }
+      else
       {
         voice[i].NoteOn(midiNum);
         voice[i].VelocityOn(velocity);
-
-        return;
       }
-      else if (i == (MODE - 1))
+
+      return;
+    }
+    else if (i == (voices - 1))
+    {
+      for (int u = 0; u < 8; u++)
+      {
+        if (UnusedNotes[u] == 128)
+        {
+          UnusedNotes[u] = voice[i].MidiNum;
+          break;
+        }
+      }
+
+      if (MODE == 5)
+      {
+        voice[V0].NoteOn(midiNum);
+        voice[V1].NoteOn(midiNum);
+        voice[V2].NoteOn(midiNum);
+        voice[V3].NoteOn(midiNum);
+      }
+      else
       {
         voice[i].NoteOn(midiNum);
         voice[i].VelocityOn(velocity);
       }
     }
-  }
-  else
-  {
-    voice[V0].NoteOn(midiNum);
-    voice[V1].NoteOn(midiNum);
-    voice[V2].NoteOn(midiNum);
-    voice[V3].NoteOn(midiNum);
   }
 }
 
 void NoteOff(byte midiNum)
 {
-  if (MODE != 5)
-  {
-    for (int i = 0; i < MODE; i++) {
-      if (voice[i].noteState == true && voice[i].MidiNum == midiNum)
+  for (int i = 0; i < voices; i++) {
+    if (voice[i].noteState == true && voice[i].MidiNum == midiNum)
+    {
+      if (MODE == 5)
+      {
+        voice[V0].NoteOff();
+        voice[V1].NoteOff();
+        voice[V2].NoteOff();
+        voice[V3].NoteOff();
+      }
+      else
       {
         voice[i].NoteOff();
-        return;
       }
+
+      for (int u = 7; u >= 0; u--) {
+        {
+          if (UnusedNotes[u] != 128)
+          {
+            if (MODE == 5)
+            {
+              voice[V0].NoteOn(UnusedNotes[u]);
+              voice[V1].NoteOn(UnusedNotes[u]);
+              voice[V2].NoteOn(UnusedNotes[u]);
+              voice[V3].NoteOn(UnusedNotes[u]);
+            }
+            else
+            {
+              voice[i].NoteOn(UnusedNotes[u]);
+            }
+
+            UnusedNotes[u] = 128;
+            break;
+          }
+        }
+      }
+
+      return;
     }
   }
-  else
+
+  for (int i = 0; i < 8; i++)
   {
-    if (voice[0].noteState == true && voice[0].MidiNum == midiNum)
+    if (UnusedNotes[i] == midiNum)
     {
-      voice[V0].NoteOff();
-      voice[V1].NoteOff();
-      voice[V2].NoteOff();
-      voice[V3].NoteOff();
+      UnusedNotes[i] = 128;
+      break;
     }
   }
 }
