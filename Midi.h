@@ -29,6 +29,8 @@ class Midi
     bool ClockOn;
     bool ClockOff;
 
+    bool ClockEnabled = false;
+
     bool AllNotesOff = true;
 
   private:

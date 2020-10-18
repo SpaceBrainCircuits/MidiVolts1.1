@@ -93,27 +93,33 @@ void Midi::Listen()
     if (_statusByte == 250 || _statusByte == 251) // Midi Start or Continue
     {
       ClockOn = true;
+      ClockEnabled = true;
       _clockCount = 0;
+      _clockCount++;
     }
     else if (_statusByte == 252) // Midi Stop
     {
+      ClockEnabled = false;
       ClockOff = true;
     }
 
-    if (_statusByte == 248) // Midi Clock
+    if (_statusByte == 248 && ClockEnabled == true) // Midi Clock
     {
-      if (_clockCount == 11)
+      if (_clockCount == 0)
+      {
+        ClockOn = true;
+      }
+      else if (_clockCount == 11)
       {
         ClockOff = true;
       }
-      if (_clockCount < 23)
+      if (_clockCount == 23)
       {
-        _clockCount++;
+        _clockCount = 0;
       }
       else
       {
-        ClockOn = true;
-        _clockCount = 0;
+        _clockCount++;
       }
     }
   }
