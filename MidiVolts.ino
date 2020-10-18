@@ -1,5 +1,5 @@
 /*
-  MidiVolts - Sample code for public use by Space Brain Circuits... mono working
+  MidiVolts - Sample code for public use by Space Brain Circuits.
 */
 
 // ************************************* USER DEFINE PARAMETERS *************************************
@@ -10,7 +10,7 @@
 // 3 VOICE POLYPHONIC ON V0, V1, V2 WITH MOD WHEEL ON V3: ..........................................3
 // 4 VOICE POLYPHONIC ON V0, V1, V2, V3: ...........................................................4
 // 4 VOICE UNISON ON V0, V1, V2, V3: ...............................................................5
-#define MODE 4
+#define MODE 1
 
 // CHOOSE RANGE OF SEMITONES FOR PITCH BEND WHEEL (DEFAULT UP: 2, DEFAULT DOWN: 12)
 #define PITCH_BEND_SEMITONES_UP 2
