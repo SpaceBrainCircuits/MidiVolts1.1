@@ -5,19 +5,24 @@
 // ************************************* USER DEFINE PARAMETERS *************************************
 
 // PLEASE CHOOSE MODE
-// 1 VOICE MONOPHONIC ON V0 WITH VELOCITY ON V1, AFTERTOUCH ON V2, AND MOD WHEEL ON V3: ............1
+// 1 VOICE MONOPHONIC ON V0 WITH VELOCITY ON V1, AFTERTOUCH ON V2, AND CC1 (MOD WHEEL) ON V3: ......1
 // 2 VOICE DUOPHONIC ON V0, V1 WITH VELOCITY ON V2 AND V3 RESPECTIVELY: ............................2
-// 3 VOICE POLYPHONIC ON V0, V1, V2 WITH MOD WHEEL ON V3: ..........................................3
+// 3 VOICE POLYPHONIC ON V0, V1, V2 WITH CC1 (MOD WHEEL) ON V3: ....................................3
 // 4 VOICE POLYPHONIC ON V0, V1, V2, V3: ...........................................................4
 // 4 VOICE UNISON ON V0, V1, V2, V3: ...............................................................5
-#define MODE 1
+// 1 VOICE MONOPHONIC ON V0 WITH CC2 ON V1, CC3 ON V2, CC4 ON V3: ..................................6
+// CC CONTROLLER WITH CC1 ON V0, CC2 ON V1, CC3 ON V2, CC4 ON V3: ..................................7
+#define MODE 4
 
 // CHOOSE RANGE OF SEMITONES FOR PITCH BEND WHEEL (DEFAULT UP: 2, DEFAULT DOWN: 12)
 #define PITCH_BEND_SEMITONES_UP 2
 #define PITCH_BEND_SEMITONES_DOWN 12
 
-// CHOOSE CONTROL FUNCTION DURING CC STATUS BYTE 192 (DEFAULT 1: MOD WHEEL)
-#define CONTROL_FUNCTION 1
+// CHOOSE CONTROL FUNCTION DURING CC STATUS BYTE 176
+#define CC1 1  // Mod Wheel
+#define CC2 49
+#define CC3 50
+#define CC4 53
 
 // CHOOSE STATUS BYTE WHEN READING AFTERTOUCH (DEFAULT 160: POLYPHONIC AFTERTOUCH)
 #define AFTERTOUCH 160
@@ -46,14 +51,14 @@ void setup() {
 
   // for fine tune calibration, please see README or Calibration Guide
   // sample code for calibration
-//  voice[0].Gain = 1;
-//  voice[0].Offset = 0;
-//  voice[1].Gain = 1.008;
-//  voice[1].Offset = 0;
-//  voice[2].Gain = 1;
-//  voice[2].Offset = 0;
-//  voice[3].Gain = 1.004;
-//  voice[3].Offset = 0.003;
+//    voice[0].Gain = 1;
+//    voice[0].Offset = 0;
+//    voice[1].Gain = 1.008;
+//    voice[1].Offset = 0;
+//    voice[2].Gain = 1;
+//    voice[2].Offset = 0;
+//    voice[3].Gain = 1.004;
+//    voice[3].Offset = 0.003;
 
   Serial.begin(31250); //Midi baud
   Wire.begin();
@@ -71,9 +76,13 @@ void setup() {
     voice[V1].VelocityPin = V3; //pitch CV set on V1 will have corresponding Velocity on V3
   }
 
-  if (MODE == 5)
+  if (MODE == 5 || MODE == 6)
   {
     voices = 1;
+  }
+  else if (MODE == 7)
+  {
+    voices = 0;
   }
   else
   {
@@ -96,7 +105,7 @@ void loop() {
 
   if (midi.BendOn == true) // Bend notes
   {
-    if (MODE == 1)
+    if (MODE == 1 || MODE == 6)
     {
       voice[V0].Bend(midi.Bend, PITCH_BEND_SEMITONES_UP, PITCH_BEND_SEMITONES_DOWN);
     }
@@ -111,7 +120,7 @@ void loop() {
       voice[V1].Bend(midi.Bend, PITCH_BEND_SEMITONES_UP, PITCH_BEND_SEMITONES_DOWN);
       voice[V2].Bend(midi.Bend, PITCH_BEND_SEMITONES_UP, PITCH_BEND_SEMITONES_DOWN);
     }
-    else // MODE 4 or 5
+    else if (MODE == 4 || MODE == 5)
     {
       voice[V0].Bend(midi.Bend, PITCH_BEND_SEMITONES_UP, PITCH_BEND_SEMITONES_DOWN);
       voice[V1].Bend(midi.Bend, PITCH_BEND_SEMITONES_UP, PITCH_BEND_SEMITONES_DOWN);
@@ -122,9 +131,34 @@ void loop() {
 
   if (midi.ControlOn == true) // CC
   {
-    if (midi.ControlFunction == CONTROL_FUNCTION)
+    if (midi.ControlFunction == CC1)
     {
       if (MODE == 1 || MODE == 3)
+      {
+        voice[V3].CC(midi.Control);
+      }
+      else if (MODE == 7)
+      {
+        voice[V0].CC(midi.Control);
+      }
+    }
+    if (midi.ControlFunction == CC2)
+    {
+      if (MODE == 6 || MODE == 7)
+      {
+        voice[V1].CC(midi.Control);
+      }
+    }
+    if (midi.ControlFunction == CC3)
+    {
+      if (MODE == 6 || MODE == 7)
+      {
+        voice[V2].CC(midi.Control);
+      }
+    }
+    if (midi.ControlFunction == CC4)
+    {
+      if (MODE == 6 || MODE == 7)
       {
         voice[V3].CC(midi.Control);
       }
