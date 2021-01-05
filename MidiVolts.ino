@@ -180,7 +180,6 @@ void loop() {
   }
 }
 
-
 void NoteOn(byte midiNum, byte velocity) // Sets voltage to next available voice.
 {
   for (int i = 0; i < voices; i++) {
