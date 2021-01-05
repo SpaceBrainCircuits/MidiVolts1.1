@@ -13,6 +13,7 @@ void Midi::Listen()
   ClockOff = false;
   BendOn = false;
   ControlOn = false;
+  AftertouchOn = false;
 
   if (Serial.available() > 0) // if serial exists
   {
@@ -86,6 +87,14 @@ void Midi::Listen()
       ControlFunction = currentByte;
       while (!Serial.available()) {} // waits until serial exists
       Control = Serial.read();
+    }
+
+    //Aftertouch
+
+    if (currentByte < 128 && _statusByte == 208)
+    {
+      AftertouchOn = true;
+      Aftertouch = currentByte;
     }
 
     // Midi Clock

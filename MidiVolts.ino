@@ -12,7 +12,7 @@
 // 4 VOICE UNISON ON V0, V1, V2, V3: ...............................................................5
 // 1 VOICE MONOPHONIC ON V0 WITH CC2 ON V1, CC3 ON V2, CC4 ON V3: ..................................6
 // CC CONTROLLER WITH CC1 ON V0, CC2 ON V1, CC3 ON V2, CC4 ON V3: ..................................7
-#define MODE 4
+#define MODE 5
 
 // CHOOSE RANGE OF SEMITONES FOR PITCH BEND WHEEL (DEFAULT UP: 2, DEFAULT DOWN: 12)
 #define PITCH_BEND_SEMITONES_UP 2
@@ -23,9 +23,6 @@
 #define CC2 49
 #define CC3 50
 #define CC4 53
-
-// CHOOSE STATUS BYTE WHEN READING AFTERTOUCH (DEFAULT 160: POLYPHONIC AFTERTOUCH)
-#define AFTERTOUCH 160
 
 // CHOOSE PIN TO OUTPUT CLOCK PULSE (DEFAULT: 8)
 #define CLOCK_PIN 8
@@ -51,14 +48,14 @@ void setup() {
 
   // for fine tune calibration, please see README or Calibration Guide
   // sample code for calibration
-//    voice[0].Gain = 1;
-//    voice[0].Offset = 0;
-//    voice[1].Gain = 1.008;
-//    voice[1].Offset = 0;
-//    voice[2].Gain = 1;
-//    voice[2].Offset = 0;
-//    voice[3].Gain = 1.004;
-//    voice[3].Offset = 0.003;
+  //    voice[0].Gain = 1;
+  //    voice[0].Offset = 0;
+  //    voice[1].Gain = 1.008;
+  //    voice[1].Offset = 0;
+  //    voice[2].Gain = 1;
+  //    voice[2].Offset = 0;
+  //    voice[3].Gain = 1.004;
+  //    voice[3].Offset = 0.003;
 
   Serial.begin(31250); //Midi baud
   Wire.begin();
@@ -167,12 +164,9 @@ void loop() {
 
   if (midi.AftertouchOn == true)
   {
-    if (midi.Aftertouch == AFTERTOUCH)
+    if (MODE == 1)
     {
-      if (MODE == 1)
-      {
-        voice[V2].CC(midi.Aftertouch);
-      }
+      voice[V2].CC(midi.Aftertouch);
     }
   }
 
