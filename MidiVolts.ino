@@ -12,11 +12,11 @@
 // 4 VOICE UNISON ON V0, V1, V2, V3: ...............................................................5
 // 1 VOICE MONOPHONIC ON V0 WITH CC2 ON V1, CC3 ON V2, CC4 ON V3: ..................................6
 // CC CONTROLLER WITH CC1 ON V0, CC2 ON V1, CC3 ON V2, CC4 ON V3: ..................................7
-#define MODE 5
+#define MODE 4
 
 // CHOOSE RANGE OF SEMITONES FOR PITCH BEND WHEEL (DEFAULT UP: 2, DEFAULT DOWN: 12)
 #define PITCH_BEND_SEMITONES_UP 2
-#define PITCH_BEND_SEMITONES_DOWN 12
+#define PITCH_BEND_SEMITONES_DOWN 2
 
 // CHOOSE CONTROL FUNCTION DURING CC STATUS BYTE 176
 #define CC1 1  // Mod Wheel
